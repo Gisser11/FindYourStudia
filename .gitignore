@@ -1,0 +1,12 @@
+bin
+.vs
+.idea
+./idea/
+/idea/
+obj
+/obj/
+/obj
+./obj
+/Migrations
+.Migrations
+./Migrations
