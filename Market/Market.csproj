@@ -56,6 +56,14 @@
       <Compile Remove="Views\Admin\Index.cshtml.cs" />
     </ItemGroup>
 
+
+
+
+
+
+
+
+
     <Target Name="NSwagVS" BeforeTargets="DispatchToInnerBuilds" Condition="$(Configuration)=='Debug'">
         <Exec Command="$(NSwagExe_Core31) run client.nswag /variables:Configuration=$(Configuration)" />
     </Target>

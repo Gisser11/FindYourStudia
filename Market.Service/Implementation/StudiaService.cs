@@ -54,10 +54,7 @@ public class StudiaService : IStudiaService
                 Name = studiaViewModel.Name,
                 City = studiaViewModel.City,
                 DataCreate = DateTime.UtcNow,
-                MedianPrice = studiaViewModel.MedianPrice,
                 Rating = studiaViewModel.Rating,
-                TypeStudia = studiaViewModel.TypeStudia,
-                TypeAdvantages = studiaViewModel.TypeAdvantages
             };
 
             await _studiaRepository.Create(studia);

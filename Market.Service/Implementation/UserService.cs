@@ -96,7 +96,7 @@ public class UserService : IUserService
                 Name = dto.Name,
                 Email = dto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                TypeUserRole = dto.TypeUserRole == false ? "SimpleUser" : "StudiaCreator"
+                TypeUserRole = dto.TypeUserRole == null ? "SimpleUser" : "StudiaCreator"
             };
             var response = _userRepository.Create(user);
             baseResponse.StatusCode = StatusCode.OK;

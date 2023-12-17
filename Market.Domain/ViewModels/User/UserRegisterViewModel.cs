@@ -9,5 +9,5 @@ public class UserRegisterViewModel
 
     public string Password { get; set; }
     
-    public bool? TypeUserRole { get; set; }
+    public string? TypeUserRole { get; set; }
 }

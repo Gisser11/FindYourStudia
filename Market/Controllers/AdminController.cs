@@ -9,15 +9,14 @@ namespace Market.Controllers;
 [Route("[controller]")]
 public class AdminController : Controller
 {
-    private readonly IUserRepository _userRepository;
+    
     private readonly IAdminService _adminService;
     private readonly IStudiaService _studiaService;
     private readonly IAssortmentService _assortmentService;
     private readonly IUserService _userService;
 
-    public AdminController(IUserRepository userRepository, IAdminService adminService, IStudiaService studiaService, IAssortmentService assortmentService, IUserService userService)
+    public AdminController (IAdminService adminService, IStudiaService studiaService, IAssortmentService assortmentService, IUserService userService)
     {
-        _userRepository = userRepository;
         _adminService = adminService;
         _studiaService = studiaService;
         _assortmentService = assortmentService;
@@ -87,8 +86,8 @@ public class AdminController : Controller
     [Route("CreateOrUpdateUser")]
     public async Task<IActionResult> Create([FromBody] UserRegisterViewModel dto)
     {
-        dto.TypeUserRole = true;
-        var response = _userService.RegisterUser(dto);
+        dto.TypeUserRole = "true";
+        var response = await _userService.RegisterUser(dto);
         
         return Json(response);
     }

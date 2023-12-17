@@ -53,7 +53,7 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] UserRegisterViewModel dto)
     {
-        dto.TypeUserRole = false;
+        dto.TypeUserRole = "false";
         
         var response = _userService.RegisterUser(dto);
         

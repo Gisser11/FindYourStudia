@@ -18,9 +18,16 @@ public class UserRepository : IUserRepository
     #endregion
     public async Task<bool> Create(User entity)
     {
-        await _db.User.AddAsync(entity);
-        await _db.SaveChangesAsync();
-        return true;
+        try
+        {
+            await _db.User.AddAsync(entity);
+            await _db.SaveChangesAsync();
+            return true; 
+        }
+        catch (Exception ex)
+        {
+            return false; 
+        }
     }
     
     public async Task<bool> Delete(int id)

@@ -36,7 +36,7 @@ public class AssortmentRepository : IAssortmentRepository
     public Task<List<Assortment>> GetAssortmentsWithKey(int id)
     {
         return _db.Assortments
-            .Where(_ => _.AssortmentId == id)
+            .Where(_ => _.StudiaId == id)
             .ToListAsync();
     }
  

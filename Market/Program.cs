@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -20,8 +19,9 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext> (
-    options => options.UseNpgsql(connectionString)
+    options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly("Market"))
     );
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IStudiaRepository, StudiaRepository>();
@@ -30,6 +30,8 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IAssortmentRepository, AssortmentRepository>();
 builder.Services.AddScoped<IAssortmentService, AssortmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICartService, CartService>();
+
 builder.Services.AddEndpointsApiExplorer();
  
 

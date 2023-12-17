@@ -8,24 +8,12 @@ public class ApplicationDbContext : DbContext
 {
     #region BackendAndMigrationsConfig
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            string connectionString = configuration.GetConnectionString("MarketDatabase");
-
-            optionsBuilder.UseNpgsql(connectionString, b => b.MigrationsAssembly("Market"));
-        }
-    }
+    
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
+        
     }
 
     #endregion
@@ -37,21 +25,30 @@ public class ApplicationDbContext : DbContext
     public DbSet<Assortment> Assortments { get; set; }
 
     public DbSet<Service> Services { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity => { entity.HasIndex(e => e.Email).IsUnique(); });
-        
+    
         modelBuilder.Entity<Assortment>()
-            .HasOne(s => s.Studia)
-            .WithMany(a => a.Assortments)
-            .HasForeignKey(a => a.AssortmentId);
+            .HasOne(a => a.Studia)
+            .WithMany(s => s.Assortments)
+            .HasForeignKey(a => a.StudiaId);
 
-        modelBuilder.Entity<Service>().HasOne(s => s.Studia)
-            .WithMany(_services => _services.Services)
-            .HasForeignKey(_services => _services.ServicesId);
+        modelBuilder.Entity<Service>()
+            .HasOne(s => s.Studia)
+            .WithMany(st => st.Services)
+            .HasForeignKey(s => s.StudiaId); 
+        
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Studia) 
+            .WithMany() 
+            .HasForeignKey(o => o.StudiaId);
     }
+    
 }
+
+//TODO сделать корзину без связей, но в сервисах через ленивую загрузку по айдишникам стягивать заказы. 
 
 /*
 INSERT INTO "Studia" ("Name", "City", "DataCreate", "MedianPrice", "Rating", "TypeStudia", "TypeAdvantages")

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Market.Controllers;
 
 [ApiController]
-[Route("api/Studia")]
+[Route("api/[controller]")]
 public class StudiaController : Controller
 {
     private readonly JwtService _jwtService;
