@@ -2,7 +2,6 @@ using Market.DAL;
 using Market.DAL.Interfaces;
 using Market.DAL.Interfaces.IServices;
 using Market.DAL.Repositories;
-using Market.DAL.Repositories.Services;
 using Market.Service.Implementation;
 using Market.Service.Interfaces;
 using Microsoft.EntityFrameworkCore; 
@@ -23,7 +22,6 @@ builder.Services.AddDbContext<ApplicationDbContext> (
     );
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IStudiaRepository, StudiaRepository>();
 builder.Services.AddScoped<IStudiaService, StudiaService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
@@ -31,6 +29,7 @@ builder.Services.AddScoped<IAssortmentRepository, AssortmentRepository>();
 builder.Services.AddScoped<IAssortmentService, AssortmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
  
@@ -40,7 +39,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(builder =>
     {
         builder
-            .WithOrigins("https://localhost:3000", "http://127.0.0.1:5500")
+            .WithOrigins("http://localhost:5173", "http://localhost:5500", "http://127.0.0.1:5500")
             .AllowAnyMethod()
             .AllowCredentials()
             .AllowAnyHeader();
@@ -58,15 +57,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseCors();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthorization();
 app.UseAuthentication();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Admin}/{action=Index}/{id?}");
 });
 app.Run();

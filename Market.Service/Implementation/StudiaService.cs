@@ -44,32 +44,7 @@ public class StudiaService : IStudiaService
         }
     }
 
-    public async Task<IBaseResponse<StudiaViewModel>> CreateStudia(StudiaViewModel studiaViewModel)
-    {
-        var baseResponse = new BaseResponse<StudiaViewModel>();
-        try
-        {
-            var studia = new Studia
-            {
-                Name = studiaViewModel.Name,
-                City = studiaViewModel.City,
-                DataCreate = DateTime.UtcNow,
-                Rating = studiaViewModel.Rating,
-            };
-
-            await _studiaRepository.Create(studia);
-        }
-        catch (Exception ex)
-        {
-            return new BaseResponse<StudiaViewModel>
-            {
-                Description = $"[create Method - ] : {ex.Message}",
-                StatusCode = StatusCode.InternalServiceError
-            };
-        }
-
-        return baseResponse;
-    }
+    
     
    
 }

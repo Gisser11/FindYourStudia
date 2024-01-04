@@ -100,18 +100,7 @@
                     property: 'Id'
                 }],
                 model: 'Report',
-                proxy: {
-                    type: 'rest',
-                    url: 'https://localhost:7135/api/GetAll', 
-                    reader: {
-                        type: 'json',
-                        rootProperty: 'DataList'
-                    },
-                    wrter: {
-                        type: 'json'
-                    }
-                },
-                
+                                
                 autoLoad: true 
             });
     
@@ -133,28 +122,8 @@
                             handler: function (grid, rowIndex, colIndex) {
                                 var record = grid.getStore().getAt(rowIndex);
                                 var reportId = record.get('id');
+                                store.remove(record)
                                 
-                                Ext.Ajax.request({
-                                    url: 'https://localhost:7135/Admin/DeleteUserId/' + reportId,
-                                    method: 'DELETE',
-                                    success: function (response, opts) { 
-                                        if (reportId === 0) {
-                                            alert("Так нельзя делать")
-                                        }
-    
-                                        if (response.StatusCode === 401) {
-                                            alert("Произведите заново вход")    
-                                        }
-    
-                                        else {
-                                            alert("Запись с ReportId " + reportId + " удалена");
-                                            store.remove(record);
-                                        }
-                                    },
-                                    failure: function (response, opts) {
-                                        alert("Произошла ошибка при удалении записи");
-                                    }
-                                });
                             }
                         }]
                     }

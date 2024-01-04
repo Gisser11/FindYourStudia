@@ -25,52 +25,79 @@ public class AdminService :IAdminService
 
     #endregion
     
-    public async Task<IBaseResponse<Studia>> EditStudia(int id, StudiaViewModel model)
+    
+    public async Task<IBaseResponse<Studia>> EditStudia(StudiaViewModel studiaViewModel)
     {
         var baseResponse = new BaseResponse<Studia>();
         
+        
+        
         try
         {
-            var studia = _studiaRepository.GetById(model.Id);
-            
-            
-            
-            return baseResponse;
+            // Создание нового автосервиса
+            if (studiaViewModel.Id == 0)
+            {
+                Random rnd = new Random();
+                double value = rnd.NextDouble() * 3 + 2;
+                
+                var studia = new Studia
+                {
+                    Name = studiaViewModel.Name,
+                    City = studiaViewModel.City,
+                    Description = studiaViewModel.Description,
+                    Rating = Math.Round(value, 2),
+                };
 
-            // if (studia == null)
-            // {
-            //     baseResponse.StatusCode = StatusCode.NotFound;
-            //     baseResponse.Description = "User not found";
-            //     return baseResponse;
-            // }
-            //
-            // // Update user properties from the model
-            // studia. = model.Name;
-            // user.Email = model.Email;
-            // user.TypeUserRole = model.TypeUserRole;
-            //
-            // await _userRepository.Update(user);
-            //
-            // baseResponse.StatusCode = StatusCode.OK;
-            // baseResponse.Data = user; 
-            //
-            // return baseResponse;
+                await _studiaRepository.Create(studia);
+                baseResponse.Description = "Создание автосервиса - успешно ";
+            }
+            
+            //Редактирование существующего
+            if (studiaViewModel.Id != 0)
+            {
+                var findedStudia = _studiaRepository.GetById(studiaViewModel.Id);
+
+                findedStudia.Name = studiaViewModel.Name;
+                findedStudia.Description = studiaViewModel.Description;
+                findedStudia.City = studiaViewModel.City;
+
+                _studiaRepository.Update(findedStudia);
+
+                baseResponse.Description = "Редактирование автосервиса - успешно ";
+            }
+
+            return baseResponse;
         }
         catch (Exception ex)
         {
-            // Log the exception for debugging
-            // logger.LogError(ex, "Error occurred while editing user.");
-
-            return new BaseResponse<Studia>()
+            return new BaseResponse<Studia>
             {
-                Description = $"[Edit] : {ex.Message}",
+                Description = $"[Создание / Редактирование автосервиса - ] : {ex.Message}",
                 StatusCode = StatusCode.InternalServiceError
             };
         }
     }
-    
-    
-    
+
+    public async Task<IBaseResponse<Studia>> DeleteStudia(int id)
+    {
+        var baseResponse = new BaseResponse<Studia>();
+        try
+        {
+            _studiaRepository.Delete(id);
+            
+            return baseResponse;
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponse<Studia>
+            {
+                Description = $"Проблема в удалении - {ex.Message}",
+                StatusCode = StatusCode.InternalServiceError
+            };
+        }
+    }
+
+
     #region UserServices
     public async Task<IBaseResponse<User>> EditUser(int id, UserViewModel model)
     {

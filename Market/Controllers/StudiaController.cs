@@ -1,5 +1,4 @@
 using Market.DAL.Interfaces;
-using Market.DAL.Repositories.Services;
 using Market.Domain.ViewModels.StudiaViewModel;
 using Market.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +9,11 @@ namespace Market.Controllers;
 [Route("api/[controller]")]
 public class StudiaController : Controller
 {
-    private readonly JwtService _jwtService;
     private readonly IStudiaService _studiaService;
     
-    public StudiaController(IStudiaService studiaService, JwtService jwtService)
+    public StudiaController(IStudiaService studiaService)
     {
         _studiaService = studiaService;
-        _jwtService = jwtService;
     }
 
     [HttpGet("GetAll")]

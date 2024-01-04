@@ -1,6 +1,5 @@
 using Market.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Market.DAL;
 
@@ -13,6 +12,7 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
+        Database.EnsureCreated();
         
     }
 
@@ -23,29 +23,37 @@ public class ApplicationDbContext : DbContext
     public DbSet<Studia> Studia { get; set; }
 
     public DbSet<Assortment> Assortments { get; set; }
-
-    public DbSet<Service> Services { get; set; }
+    
+    public DbSet<Order> Orders { get; set; }
+    
+    public DbSet<OrderDetails> OrderDetails { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity => { entity.HasIndex(e => e.Email).IsUnique(); });
-    
+
         modelBuilder.Entity<Assortment>()
             .HasOne(a => a.Studia)
             .WithMany(s => s.Assortments)
             .HasForeignKey(a => a.StudiaId);
 
-        modelBuilder.Entity<Service>()
-            .HasOne(s => s.Studia)
-            .WithMany(st => st.Services)
-            .HasForeignKey(s => s.StudiaId); 
-        
         modelBuilder.Entity<Order>()
-            .HasOne(o => o.Studia) 
-            .WithMany() 
-            .HasForeignKey(o => o.StudiaId);
+            .HasOne(o => o.Customer)
+            .WithMany()
+            .HasForeignKey(o => o.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<OrderDetails>()
+            .HasOne(od => od.Order)
+            .WithMany(o => o.OrderDetails)
+            .HasForeignKey(od => od.OrderId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<OrderDetails>()
+            .HasOne(od => od.Assortment)
+            .WithMany()
+            .HasForeignKey(od => od.AssortmentId);
     }
-    
 }
 
 //TODO сделать корзину без связей, но в сервисах через ленивую загрузку по айдишникам стягивать заказы. 

@@ -96,7 +96,7 @@ public class UserService : IUserService
                 Name = dto.Name,
                 Email = dto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                TypeUserRole = dto.TypeUserRole == null ? "SimpleUser" : "StudiaCreator"
+                TypeUserRole = dto.TypeUserRole == "false" ? "SimpleUser" : "StudiaCreator"
             };
             var response = _userRepository.Create(user);
             baseResponse.StatusCode = StatusCode.OK;
@@ -162,7 +162,7 @@ public class UserService : IUserService
         {
             var response = _userRepository.Select();
 
-            if (response.Result == null)
+            if (response == null)
             {
                 baseResponse.StatusCode = StatusCode.NotFound;
                 baseResponse.Description = "Не найдено записей  ";

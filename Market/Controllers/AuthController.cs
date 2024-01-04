@@ -1,5 +1,4 @@
 using Market.DAL.Interfaces;
-using Market.DAL.Repositories.Services;
 using Market.Domain.Entity;
 using Market.Domain.ViewModels.User;
 using Market.Service.Interfaces;
@@ -40,15 +39,17 @@ public class AuthController : Controller
         return Ok(true);
     }
     
+    //Пользователь по Id, нужно, чтобы узнать роль
     [Route("GetById/{id:int}")]
     [HttpGet]
-    public async Task<IActionResult> Register([FromRoute] int id)
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var response = _userService.GetById(id);
 
         return Ok(response.Result);
     }
     
+    // Регистрация пользователя
     [Route("register")]
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] UserRegisterViewModel dto)
@@ -100,7 +101,7 @@ public class AuthController : Controller
         return Json(response);
     }
     
-    // ВЫХОД ИЗ СИСТЕМЫ
+    // Выход
     [HttpPost("delete")]
     public IActionResult Logout()
     {

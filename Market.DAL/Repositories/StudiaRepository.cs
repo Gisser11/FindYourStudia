@@ -1,5 +1,6 @@
 using Market.DAL.Interfaces.IServices;
 using Market.Domain.Entity;
+using Market.Domain.ViewModels.StudiaViewModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL.Repositories;
@@ -19,9 +20,17 @@ public class StudiaRepository : IStudiaRepository
 
     public async Task<bool> Create(Studia entity)
     {
-        await _db.Studia.AddAsync(entity);
-        await _db.SaveChangesAsync();
-        return true;
+        try
+        {
+            await _db.Studia.AddAsync(entity);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"StudiaRepository [create ] - {ex.Message}");
+            return false;
+        }
     }
     
     public async Task<List<Studia>> Select()
@@ -29,14 +38,21 @@ public class StudiaRepository : IStudiaRepository
         return await _db.Studia.Include(x => x.Assortments).ToListAsync(); 
     }
     
-    public Task<bool> Delete(int id)
+    public async Task<bool> Delete(int id)
     {
-        throw new NotImplementedException();
+        var entity = GetById(id);
+        
+        _db.Studia.Remove(entity);
+        await _db.SaveChangesAsync();
+        
+        return true;
     }
 
-    public Task<bool> Update(Studia entity)
+    public async Task<bool> Update(Studia entity)
     {
-        throw new NotImplementedException();
+        _db.Studia.Update(entity);
+        await _db.SaveChangesAsync();
+        return true;
     }
 
     public Studia? GetById(int id)

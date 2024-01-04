@@ -23,6 +23,19 @@ public class AdminController : Controller
         _userService = userService;
     }
     
+    /*
+     * У нас две ключевые роли: Manager, Moderator
+     * В зависимости, какая роль у пользователя, такой будет и функционал
+     * Manager - свой конкретно привязанный автосервис
+     * Moderator - доступен абсолютно весь функционал.
+     */
+    
+    #region Manager
+    
+    
+
+    #endregion
+    
     [Route("StudiaPage")]
     public IActionResult StudiaPage()
     {
@@ -40,26 +53,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] StudiaViewModel studiaViewModel)
     {
-        try
-        {
-            // var cookiesToken = Request.Cookies["token"];
-            // _jwtService.Verify(cookiesToken);
-            
-            
-            // if (studiaViewModel.Id == 0)
-            // {
-            //     await _studiaService.CreateStudia(studiaViewModel);
-            //     return Ok("успешно");
-            // }
-
-            await _adminService.EditStudia(studiaViewModel.Id, studiaViewModel);
-
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return Unauthorized();
-        }
+        var response = await _adminService.EditStudia(studiaViewModel);
+        
+        return Json(response);
     }
 
     [HttpGet]
@@ -70,8 +66,19 @@ public class AdminController : Controller
         
         return Ok(response.Data);
     }
-
+    
+    
+    [HttpDelete]
+    [Route("DeleteStudiaId/{id:int}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var response = await _adminService.DeleteStudia(id);
+        
+        return Json(response);
+    }
+    
     #endregion
+    
     
     #region USER CRUD
     [HttpDelete]
@@ -101,5 +108,6 @@ public class AdminController : Controller
         return Ok(response);
     }
     #endregion
+    
     
 }

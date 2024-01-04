@@ -10,11 +10,9 @@ public class Studia
 
     public string City { get; set; }
     
-    public decimal Rating { get; set; }
-
-    public DateTime? DataCreate { get; set; }
+    public string Description { get; set; }
+    
+    public double Rating { get; set; }
     
     public List<Assortment> Assortments { get; set; }
-    
-    public List<Service> Services { get; set; }
 }

@@ -1,36 +1,32 @@
 using Market.Domain.ViewModels;
+using Market.Domain.ViewModels.Orders;
 using Market.Service.Implementation;
 using Market.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Market.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
-    private readonly IUserService _userService;
 
-    public CartController(ICartService cartService, IUserService userService)
+    public CartController(ICartService cartService)
     {
         _cartService = cartService;
-        _userService = userService;
     }
 
-    [Route("addToCart")]
+    [Route("addToCart/${studiaID}")]
     [HttpPost]
-    public async Task<IActionResult> AddToCart(ResponseToCartViewModel dto)
+    public async Task<IActionResult> AddToCart([FromBody] OrderViewModel orderViewModel, int studiaID)
     {
-        if (Request.Cookies["token"] != null)
+        var value = Request.Cookies["token"];
+        if (value != null)
         {
-            var value = Request.Cookies["token"];
-            var UserId = _userService.Verify(value).Issuer; // с токена
-
-            dto.UserId = int.Parse(_userService.Verify(value).Issuer);
+            var response = await _cartService.AddToCart(value, orderViewModel.AssortmentIDs, studiaID);
             
             return Ok();
         }
-
-        return BadRequest("Отсутсвует токен");    
+        return BadRequest("Для оформления нужно авторизоваться");    
     }
 }

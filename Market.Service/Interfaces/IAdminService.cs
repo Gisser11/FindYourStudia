@@ -11,5 +11,7 @@ public interface IAdminService
 
     Task<IBaseResponse<User>> DeleteUser(int id);
     
-    Task<IBaseResponse<Studia>> EditStudia(int id, StudiaViewModel model);
+    Task<IBaseResponse<Studia>> EditStudia(StudiaViewModel model);
+    
+    Task<IBaseResponse<Studia>> DeleteStudia(int id);
 }
