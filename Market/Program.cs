@@ -30,6 +30,7 @@ builder.Services.AddScoped<IAssortmentService, AssortmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IManagmentService, ManagmentService>();
 
 builder.Services.AddEndpointsApiExplorer();
  

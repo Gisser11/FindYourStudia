@@ -1,0 +1,72 @@
+@page
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-triton/resources/theme-triton-all-debug.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-triton/theme-triton-debug.js"></script>
+    
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+<div>
+    <script >
+        var START_URL = "https://localhost:7135"
+        var AUTH_CONTROLLER = "/Auth"
+
+        Ext.Ajax.request({
+            url: START_URL + AUTH_CONTROLLER + "/user", 
+            method: 'GET',
+            success: function (response) {
+                alert(response.json())
+            },
+            failure: function (response) {
+                var passwordWindow = Ext.create('Ext.window.Window', {
+                    title: 'Введите пароль',
+                    items: [
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'Почта',
+                            id: 'emailField',
+                        },
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'Пароль',
+                            id: 'passwordField',
+                        }, 
+                        {
+                            xtype: 'button',
+                            text: 'OK',
+                            handler: function () {
+                                let Auth_Data = {
+                                    Email: Ext.getCmp('emailField').getValue(),
+                                    Password: Ext.getCmp('passwordField').getValue()
+                                };
+                                
+                                var json = JSON.stringify(Auth_Data);
+
+                                Ext.Ajax.request({
+                                    url: START_URL + AUTH_CONTROLLER + "/login",
+                                    method: 'POST',
+                                    jsonData: json
+                                }).then(() => {
+                                    passwordWindow.close();
+                                });
+                            }
+                        }
+                    ],
+                    padding: 20
+                });
+                passwordWindow.show();
+                
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

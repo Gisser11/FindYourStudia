@@ -84,7 +84,7 @@ public class UserService : IUserService
             };
         }
     }
-
+    
     public async Task<IBaseResponse<User>> RegisterUser(UserRegisterViewModel dto)
     {
         var baseResponse = new BaseResponse<User>();

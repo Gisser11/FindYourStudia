@@ -17,7 +17,9 @@ public class StudiaRepository : IStudiaRepository
     #endregion
 
     #region StudiaMethods
-
+    
+    // сделать фронтенд. ext js отображение текущего автосервиса, вход, 
+    // отображение ассортимента, редактирование и удаление ассортимента. 
     public async Task<bool> Create(Studia entity)
     {
         try
@@ -57,8 +59,11 @@ public class StudiaRepository : IStudiaRepository
 
     public Studia? GetById(int id)
     {
-        return _db.Studia.FirstOrDefault(u => u.Id == id);
+        return _db.Studia
+            .Include(s => s.Assortments) 
+            .FirstOrDefault(u => u.ManagerId == id);
     }
 
+    
     #endregion
 }

@@ -28,9 +28,17 @@ public class AssortmentRepository : IAssortmentRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> Update(Assortment entity)
+    public async Task<bool> Update(Assortment entity)
     {
-        throw new NotImplementedException();
+        var studia = await _db.Studia.FindAsync(entity.StudiaId);
+
+        if (studia == null)
+            return false;
+        
+        await _db.Assortments.AddAsync(entity);
+        await _db.SaveChangesAsync();
+        
+        return true;
     }
 
     public Task<List<Assortment>> GetAssortmentsWithKey(int id)

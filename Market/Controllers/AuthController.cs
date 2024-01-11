@@ -69,7 +69,12 @@ public class AuthController : Controller
         if (response.Result.StatusCode == Domain.Enum.StatusCode.OK)
         {
             var token = response.Result.Token;
-            Response.Cookies.Append("token", token);
+            Response.Cookies.Append("token", token, new CookieOptions
+            {
+                HttpOnly = true, // Чтобы предотвратить доступ к куки из JavaScript
+                Secure = true, // Рекомендуется использовать только при HTTPS
+                // Другие параметры куки, если необходимо
+            });
             return Json(response);
         }
 

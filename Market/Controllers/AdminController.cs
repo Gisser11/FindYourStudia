@@ -1,7 +1,9 @@
 using Market.DAL.Interfaces;
+using Market.Domain.ViewModels.Assortments;
 using Market.Domain.ViewModels.StudiaViewModel;
 using Market.Domain.ViewModels.User;
 using Market.Service.Interfaces;
+using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Market.Controllers;
@@ -11,16 +13,16 @@ public class AdminController : Controller
 {
     
     private readonly IAdminService _adminService;
-    private readonly IStudiaService _studiaService;
+    private readonly IManagmentService _managmentService;
     private readonly IAssortmentService _assortmentService;
     private readonly IUserService _userService;
 
-    public AdminController (IAdminService adminService, IStudiaService studiaService, IAssortmentService assortmentService, IUserService userService)
+    public AdminController (IAdminService adminService, IAssortmentService assortmentService, IUserService userService, IManagmentService managmentService)
     {
         _adminService = adminService;
-        _studiaService = studiaService;
         _assortmentService = assortmentService;
         _userService = userService;
+        _managmentService = managmentService;
     }
     
     /*
@@ -29,15 +31,78 @@ public class AdminController : Controller
      * Manager - свой конкретно привязанный автосервис
      * Moderator - доступен абсолютно весь функционал.
      */
-    
     #region Manager
     
+    /*[HttpGet]
+    [Route("InitializeStudia")]
+    public async Task<IActionResult> InitializeStudia()
+    {
+        if (Request.Cookies["token"] != null)
+        {
+            string requestCookie = Request.Cookies["token"];
+            var response = await _managmentService.InitializeStudia(requestCookie);
+
+            return Ok(response.Description);
+        }
+
+        return Unauthorized();
+    }*/
     
+    [HttpGet]
+    [Route("LoadStudia")]
+    public async Task<IActionResult> LoadStudia()
+    {
+        if (Request.Cookies["token"] != null)
+        {
+            string requestCookie = Request.Cookies["token"];
+            var response = await _managmentService.GetById(requestCookie);
+            return Ok(response.Data);
+        }
+    
+        return Unauthorized();
+    }
+    
+    [HttpPost]
+    [Route("CreateStudia")]
+    public async Task<IActionResult> CreateStudia([FromBody] StudiaViewModel studiaViewModel)
+    {
+        if (Request.Cookies["token"] != null)
+        {
+            string requestCookie = Request.Cookies["token"];
+            var response = await _managmentService.CreateStudia(studiaViewModel, requestCookie);
+           
+            return Ok(response.Data);
+        }
+    
+        return Unauthorized();
+    }
+    
+    [HttpPost]
+    [Route("CreateAssortment/{studiaId:int}")]
+    public async Task<IActionResult> CreateAssortment([FromBody] AssortmentViewModel assortmentViewModel, [FromRoute] int studiaId)
+    {
+        if (Request.Cookies["token"] != null)
+        {
+            assortmentViewModel.StudiaId = studiaId;
+            var response = await _assortmentService.CreateAssortment(assortmentViewModel);
+    
+            return Ok(response.Description);
+        }
+    
+        return Unauthorized();
+    }
+
 
     #endregion
     
     [Route("StudiaPage")]
     public IActionResult StudiaPage()
+    {
+        return View();
+    }
+    
+    [Route("StudiaManagement")]
+    public IActionResult StudiaManagement()
     {
         return View();
     }
@@ -90,7 +155,7 @@ public class AdminController : Controller
     }
     
     [HttpPost]
-    [Route("CreateOrUpdateUser")]
+    [Route("Register")]
     public async Task<IActionResult> Create([FromBody] UserRegisterViewModel dto)
     {
         dto.TypeUserRole = "true";

@@ -9,6 +9,9 @@ public class StudiaViewModel
 
     [JsonPropertyName("Name")] 
     public string Name { get; set; }
+    
+    [JsonPropertyName("ManagerId")]
+    public int ManagerId { get; set; }
 
     [JsonPropertyName("City")] 
     public string City { get; set; }

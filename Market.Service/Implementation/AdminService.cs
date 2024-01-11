@@ -29,12 +29,8 @@ public class AdminService :IAdminService
     public async Task<IBaseResponse<Studia>> EditStudia(StudiaViewModel studiaViewModel)
     {
         var baseResponse = new BaseResponse<Studia>();
-        
-        
-        
         try
         {
-            // Создание нового автосервиса
             if (studiaViewModel.Id == 0)
             {
                 Random rnd = new Random();
@@ -43,6 +39,7 @@ public class AdminService :IAdminService
                 var studia = new Studia
                 {
                     Name = studiaViewModel.Name,
+                    ManagerId = studiaViewModel.ManagerId,
                     City = studiaViewModel.City,
                     Description = studiaViewModel.Description,
                     Rating = Math.Round(value, 2),
@@ -61,7 +58,7 @@ public class AdminService :IAdminService
                 findedStudia.Description = studiaViewModel.Description;
                 findedStudia.City = studiaViewModel.City;
 
-                _studiaRepository.Update(findedStudia);
+                await _studiaRepository.Update(findedStudia);
 
                 baseResponse.Description = "Редактирование автосервиса - успешно ";
             }

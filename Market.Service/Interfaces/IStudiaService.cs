@@ -7,5 +7,4 @@ namespace Market.Service.Interfaces;
 public interface IStudiaService
 {
     Task<IBaseResponse<IEnumerable<Studia>>> GetAllStudia();
-    
 }
