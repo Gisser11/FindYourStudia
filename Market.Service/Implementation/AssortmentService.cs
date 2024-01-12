@@ -51,7 +51,7 @@ public class AssortmentService: IAssortmentService
                 Name = assortmentViewModel.Name,
                 Price = assortmentViewModel.Price
             };
-            var response = await _assortmentRepository.Update(assortmentModel);
+            var response = await _assortmentRepository.Create(assortmentModel);
             baseResponse.StatusCode = StatusCode.OK;
             baseResponse.Description = "GetAssortmentList (int id) successfull\n";
             return baseResponse;
@@ -63,6 +63,52 @@ public class AssortmentService: IAssortmentService
                 Description = "GetAssortmentList (int id) failed",
                 StatusCode = StatusCode.NotFound
             };
+        }
+    }
+
+    public async Task<IBaseResponse<Assortment>> DeleteAssortment(int id)
+    {
+        var baseResponse = new BaseResponse<Assortment>();
+        try
+        {
+            var response = await _assortmentRepository.Delete(id);
+            
+            baseResponse.Description = response == true
+                ? "Удаление успешно"
+                : "Произошла ошибка в удалении, скорее всего, нужный товар не найден";
+            
+            return baseResponse;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task<IBaseResponse<Assortment>> UodateAssortment(AssortmentViewModel assortmentViewModel)
+    {
+        var baseResponse = new BaseResponse<Assortment>();
+
+        try
+        {
+            var response = await _assortmentRepository.GetById(assortmentViewModel.Id);
+
+            response.Id = assortmentViewModel.Id;
+            response.Name = assortmentViewModel.Name;
+            response.Price = assortmentViewModel.Price;
+
+            await _assortmentRepository.Update(response);
+            
+            baseResponse.Data = response;
+
+            return baseResponse;
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
         }
     }
 }

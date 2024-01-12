@@ -1,4 +1,5 @@
 using Market.DAL.Interfaces;
+using Market.Domain.ViewModels;
 using Market.Domain.ViewModels.Assortments;
 using Market.Domain.ViewModels.StudiaViewModel;
 using Market.Domain.ViewModels.User;
@@ -24,6 +25,28 @@ public class AdminController : Controller
         _userService = userService;
         _managmentService = managmentService;
     }
+
+    #region Views
+
+    [Route("StudiaPage")]
+    public IActionResult StudiaPage()
+    {
+        return View();
+    }
+    
+    [Route("StudiaManagement")]
+    public IActionResult StudiaManagement()
+    {
+        return View();
+    }
+    
+    [Route("UserPage")]
+    public IActionResult UserPage()
+    {
+        return View();
+    }
+
+    #endregion
     
     /*
      * У нас две ключевые роли: Manager, Moderator
@@ -33,20 +56,7 @@ public class AdminController : Controller
      */
     #region Manager
     
-    /*[HttpGet]
-    [Route("InitializeStudia")]
-    public async Task<IActionResult> InitializeStudia()
-    {
-        if (Request.Cookies["token"] != null)
-        {
-            string requestCookie = Request.Cookies["token"];
-            var response = await _managmentService.InitializeStudia(requestCookie);
-
-            return Ok(response.Description);
-        }
-
-        return Unauthorized();
-    }*/
+    
     
     [HttpGet]
     [Route("LoadStudia")]
@@ -92,26 +102,26 @@ public class AdminController : Controller
         return Unauthorized();
     }
 
-
+    [HttpDelete]
+    [Route("DeleteAssortment")]
+    public async Task<IActionResult> DeleteAssortment([FromBody] IdViewModel DTO)   
+    {
+        var response = await _assortmentService.DeleteAssortment(DTO.id);
+        
+        return Ok(response.Description);
+    }
+    
+    [HttpPost]
+    [Route("UpdateAssortment")]
+    public async Task<IActionResult> UpdateAssortment([FromBody] AssortmentViewModel assortmentViewModel)   
+    {
+        var response = await _assortmentService.UodateAssortment(assortmentViewModel);
+        
+        return Ok(response);
+    }
+    
     #endregion
     
-    [Route("StudiaPage")]
-    public IActionResult StudiaPage()
-    {
-        return View();
-    }
-    
-    [Route("StudiaManagement")]
-    public IActionResult StudiaManagement()
-    {
-        return View();
-    }
-    
-    [Route("UserPage")]
-    public IActionResult UserPage()
-    {
-        return View();
-    }
 
     #region STUDIA CRUD
     [Route("CreateOrUpdateStudia")]

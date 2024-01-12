@@ -2,7 +2,7 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all-debug.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-triton/resources/theme-triton-all-debug.css">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-triton/theme-triton-debug.js"></script>
-    
+
 @{
     Layout = null;
 }
@@ -11,62 +11,226 @@
 
 <html>
 <head>
-    <title>title</title>
+    <title>Управление автосервисом</title>
 </head>
 <body>
-<div>
-    <script >
-        var START_URL = "https://localhost:7135"
-        var AUTH_CONTROLLER = "/Auth"
-
-        Ext.Ajax.request({
-            url: START_URL + AUTH_CONTROLLER + "/user", 
-            method: 'GET',
-            success: function (response) {
-                alert(response.json())
-            },
-            failure: function (response) {
-                var passwordWindow = Ext.create('Ext.window.Window', {
-                    title: 'Введите пароль',
-                    items: [
-                        {
-                            xtype: 'textfield',
-                            fieldLabel: 'Почта',
-                            id: 'emailField',
-                        },
-                        {
-                            xtype: 'textfield',
-                            fieldLabel: 'Пароль',
-                            id: 'passwordField',
-                        }, 
-                        {
-                            xtype: 'button',
-                            text: 'OK',
-                            handler: function () {
-                                let Auth_Data = {
-                                    Email: Ext.getCmp('emailField').getValue(),
-                                    Password: Ext.getCmp('passwordField').getValue()
-                                };
-                                
-                                var json = JSON.stringify(Auth_Data);
-
-                                Ext.Ajax.request({
-                                    url: START_URL + AUTH_CONTROLLER + "/login",
-                                    method: 'POST',
-                                    jsonData: json
-                                }).then(() => {
-                                    passwordWindow.close();
-                                });
-                            }
-                        }
-                    ],
-                    padding: 20
-                });
-                passwordWindow.show();
+<div id="main"></div>
+<script>
+    var START_URL = "https://localhost:7135";
+    var AUTH_CONTROLLER = "/Auth";
+    var ADMIN_CONTROLLER = "/Admin";
+    
+    Ext.application({
+        name: 'MyApp',
+        launch: function () {
+            var container = Ext.create('Ext.container.Container', {
+                layout: 'vbox',
+                items: [
+                    Ext.create('Ext.Button', {
+                        text: 'Добавление товара в автосервис',
+                        renderTo: Ext.getBody(),
+                        margin: 40,
+                        height: 30,
+                        handler: function () {
+                            var userWindow = Ext.create('Ext.window.Window', {
+                                title: 'Добавить пользователя',
+                                layout: 'form',
+                                items: [{
+                                    xtype: 'form',
+                                    itemId: 'userForm',
+                                    items: [{
+                                        xtype: 'textfield',
+                                        fieldLabel: 'Name',
+                                        name: 'name'
+                                    }, {
+                                        xtype: 'textfield',
+                                        fieldLabel: 'Price',
+                                        name: 'price'
+                                    }]
+                                }],
+                                buttons: [{
+                                    text: 'Сохранить',
+                                    handler: function () {
+                                        var form = userWindow.down('#userForm').getForm();
+                                        if (form.isValid()) {
+                                            var formData = form.getValues();
+                                    
+                                            Ext.Ajax.request({
+                                                url: START_URL + ADMIN_CONTROLLER + "/CreateAssortment/11",
+                                                method: 'POST',
+                                                jsonData: formData,
+                                                success: function (response) {
+                                                    console.log('Данные успешно отправлены', response);
+                                                    userWindow.close();
+                                                },
+                                                failure: function (response) {
+                                                    console.error('Ошибка при отправке данных', response);
+                                                }
+                                            });
+                                        }
+                                    }
+                                }, {
+                                    text: 'Отмена',
+                                    handler: function () {
+                                        userWindow.close();
+                                    }
+                                }]
+                            });
                 
-            }
-        });
-    </script>
-</div>
+                            userWindow.show();
+                        }
+                    }),
+                    
+                ]
+            },
+            Ext.Ajax.request({
+                                                url: START_URL + AUTH_CONTROLLER + "/user",
+                                                method: 'GET',
+                                                success: function (response) {
+                                                    Ext.define('AssortmentModel', {
+                                                        extend: 'Ext.data.Model',
+                                                        fields: ['id', 'studiaId', 'name', 'price']
+                                                    });
+                                                    
+                                                    var assortmentStore = Ext.create('Ext.data.Store', {
+                                                        model: 'AssortmentModel',
+                                                        proxy: {
+                                                            type: 'rest',
+                                                            url: START_URL + ADMIN_CONTROLLER + "/LoadStudia",
+                                                            reader: {
+                                                                type: 'json',
+                                                                rootProperty: 'assortments'
+                                                            },
+                                                            writer: {
+                                                                type: 'json'
+                                                            }
+                                                        },
+                                                        autoLoad: true 
+                                                    });
+                                                    
+                                                    var assortmentGrid = Ext.create('Ext.grid.Panel', {
+                                                        title: 'Управление автосервисом ',
+                                                        store: assortmentStore,
+                                                        columns: [
+                                                            { text: 'Индекс', dataIndex: 'id'},
+                                                            { text: 'Название товара', dataIndex: 'name', editor: 'textfield', flex: 1 },
+                                                            { text: 'Цена', dataIndex: 'price', editor: 'textfield'},
+                                                            {
+                                                                xtype: 'actioncolumn',
+                                                                text: 'Удаление', 
+                                                                items: [{
+                                                                    iconCls: 'x-fa fa-trash-o', 
+                                                                    tooltip: 'Методы',
+                                                                    handler: function (grid, rowIndex, colIndex) {
+                                                                        var record = assortmentGrid.getStore().getAt(rowIndex);
+                                                                        var reportId = record.get('id');
+                                                                        
+                                                                        let Auth_Data = {
+                                                                            Id: reportId
+                                                                        };
+                                                                        
+                                                                        var json = JSON.stringify(Auth_Data);
+                                                                        
+                                                                        Ext.Ajax.request({
+                                                                            url: START_URL + ADMIN_CONTROLLER + "/DeleteAssortment", 
+                                                                            method: 'DELETE',
+                                                                            jsonData: json,
+                                                                            success: function (response, opts) { 
+                                                                                alert("Данные успешно удалены")
+                                                                                assortmentGrid.getStore().remove(record)
+                                                                            },
+                                                                            failure: function (response, opts) {
+                                                                                alert("Ошибка ")
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }]
+                                                            }
+                                                        ],
+                                                        selType: 'rowmodel',
+                                                        plugins: [
+                                                            Ext.create('Ext.grid.plugin.RowEditing', {
+                                                                clicksToEdit: 2,
+                                                                saveBtnText: 'Сохранить',
+                                                                cancelBtnText: 'Отменить',
+                                                                listeners: {
+                                                                    edit: function (editor, context) {
+                                                                        var record = context.record;
+                                                                        var changes = record.getChanges();
+                                                                        var allFields = record.getFields();
+                                                                        var dataToSend = {};
+                                                    
+                                                                        allFields.forEach(function (field) {
+                                                                            var fieldName = field.name;
+                                                                            var fieldValue = record.get(fieldName);
+                                                    
+                                                                            if (changes.hasOwnProperty(fieldName)) {
+                                                                                dataToSend[fieldName] = changes[fieldName];
+                                                                            } else {
+                                                                                dataToSend[fieldName] = fieldValue;
+                                                                            }
+                                                                        });
+                                                    
+                                                                        Ext.Ajax.request({
+                                                                            url: START_URL + ADMIN_CONTROLLER + "/UpdateAssortment",
+                                                                            method: 'POST',
+                                                                            jsonData: dataToSend,
+                                                                            success: function (response) {
+                                                                                console.log('Успешно обновлено', response);
+                                                                            },
+                                                                            failure: function (response) {
+                                                                                console.error('Ошибка при обновлении', response);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                            })
+                                                        ],
+                                                    });
+                                                    assortmentGrid.render('main');
+                                                },
+                                                failure: function (response) {
+                                                    var passwordWindow = Ext.create('Ext.window.Window', {
+                                                        title: 'Введите пароль',
+                                                        items: [
+                                                            {
+                                                                xtype: 'textfield',
+                                                                fieldLabel: 'Почта',
+                                                                id: 'emailField',
+                                                            },
+                                                            {
+                                                                xtype: 'textfield',
+                                                                fieldLabel: 'Пароль',
+                                                                id: 'passwordField',
+                                                            },
+                                                            {
+                                                                xtype: 'button',
+                                                                text: 'OK',
+                                                                handler: function () {
+                                                                    let Auth_Data = {
+                                                                        Email: Ext.getCmp('emailField').getValue(),
+                                                                        Password: Ext.getCmp('passwordField').getValue()
+                                                                    };
+                                
+                                                                    var json = JSON.stringify(Auth_Data);
+                                
+                                                                    Ext.Ajax.request({
+                                                                        url: START_URL + AUTH_CONTROLLER + "/login",
+                                                                        method: 'POST',
+                                                                        jsonData: json
+                                                                    }).then(() => {
+                                                                        passwordWindow.close();
+                                                                    });
+                                                                }
+                                                            }
+                                                        ],
+                                                        padding: 20,
+                                                    });
+                                                    passwordWindow.show();
+                                                }
+                                            }))
+        }
+    });
+</script>
 </body>
 </html>

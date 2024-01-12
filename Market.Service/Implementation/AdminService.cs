@@ -49,11 +49,10 @@ public class AdminService :IAdminService
                 baseResponse.Description = "Создание автосервиса - успешно ";
             }
             
-            //Редактирование существующего
             if (studiaViewModel.Id != 0)
             {
-                var findedStudia = _studiaRepository.GetById(studiaViewModel.Id);
-
+                var findedStudia = await _studiaRepository.GetByIdOnlyStudia(studiaViewModel.Id);
+                
                 findedStudia.Name = studiaViewModel.Name;
                 findedStudia.Description = studiaViewModel.Description;
                 findedStudia.City = studiaViewModel.City;

@@ -160,19 +160,11 @@ public class UserService : IUserService
 
         try
         {
-            var response = _userRepository.Select();
-
-            if (response == null)
-            {
-                baseResponse.StatusCode = StatusCode.NotFound;
-                baseResponse.Description = "Не найдено записей  ";
-                return baseResponse;
-            }
-            
+            var response = await _userRepository.Select();
             
             baseResponse.Description = "Успешно";
             baseResponse.StatusCode = StatusCode.OK;
-            baseResponse.Data = response.Result;
+            baseResponse.Data = response;
             return baseResponse;
         }
         catch (Exception ex)

@@ -64,6 +64,11 @@ public class StudiaRepository : IStudiaRepository
             .FirstOrDefault(u => u.ManagerId == id);
     }
 
-    
+    public async Task<Studia> GetByIdOnlyStudia(int id)
+    {
+        var response = await _db.Studia.FirstOrDefaultAsync(_ => _.Id == id);
+        return response;
+    }
+
     #endregion
 }

@@ -17,74 +17,76 @@
 <body>
 <div>
     <script >
+    var START_URL = "https://localhost:7135"
+    
     Ext.application({
         name: 'MyApp',
         launch: function () {
             var container = Ext.getBody(); 
-                    container.setStyle({
-                        padding: '20px',
-                        height: '100%',
-                        overflow: 'hidden'
-                    });
+            container.setStyle({
+                width: '100%',
+                overflow: 'hidden'
+            });
                     
-                    Ext.create('Ext.Button', {
-                        text: 'Добавить модератора / пользователя в систему',
-                        renderTo: Ext.getBody(),
-                        margin: 40,
-                        handler: function () {
-                            var userWindow = Ext.create('Ext.window.Window', {
-                                title: 'Добавить пользователя',
-                                layout: 'form',
-                                items: [{
-                                    xtype: 'form',
-                                    itemId: 'userForm',
-                                    items: [{
-                                        xtype: 'textfield',
-                                        fieldLabel: 'Name',
-                                        name: 'name'
-                                    }, {
-                                        xtype: 'textfield',
-                                        fieldLabel: 'Email',
-                                        name: 'email'
-                                    }, {
-                                        xtype: 'textfield',
-                                        fieldLabel: 'Password',
-                                        name: 'password',
-                                        inputType: 'password' // Поле для пароля с маскировкой ввода
-                                    }]
-                                }],
-                                buttons: [{
-                                    text: 'Сохранить',
-                                    handler: function () {
-                                        var form = userWindow.down('#userForm').getForm();
-                                        if (form.isValid()) {
-                                            var formData = form.getValues();
-                
-                                            Ext.Ajax.request({
-                                                url: 'https://localhost:7135/Admin/CreateOrUpdateUser',
-                                                method: 'POST',
-                                                jsonData: formData,
-                                                success: function (response) {
-                                                    console.log('Данные успешно отправлены', response);
-                                                    userWindow.close();
-                                                },
-                                                failure: function (response) {
-                                                    console.error('Ошибка при отправке данных', response);
-                                                }
-                                            });
+            Ext.create('Ext.Button', {
+                text: 'Добавить модератора / пользователя в систему',
+                renderTo: Ext.getBody(),
+                margin: 40,
+                height: 30,
+                handler: function () {
+                    var userWindow = Ext.create('Ext.window.Window', {
+                        title: 'Добавить пользователя',
+                        layout: 'form',
+                        items: [{
+                            xtype: 'form',
+                            itemId: 'userForm',
+                            items: [{
+                                xtype: 'textfield',
+                                fieldLabel: 'Name',
+                                name: 'name'
+                            }, {
+                                xtype: 'textfield',
+                                fieldLabel: 'Email',
+                                name: 'email'
+                            }, {
+                                xtype: 'textfield',
+                                fieldLabel: 'Password',
+                                name: 'password',
+                                inputType: 'password' // Поле для пароля с маскировкой ввода
+                            }]
+                        }],
+                        buttons: [{
+                            text: 'Сохранить',
+                            handler: function () {
+                                var form = userWindow.down('#userForm').getForm();
+                                if (form.isValid()) {
+                                    var formData = form.getValues();
+        
+                                    Ext.Ajax.request({
+                                        url: START_URL + '/Admin/CreateOrUpdateUser',
+                                        method: 'POST',
+                                        jsonData: formData,
+                                        success: function (response) {
+                                            console.log('Данные успешно отправлены', response);
+                                            userWindow.close();
+                                        },
+                                        failure: function (response) {
+                                            console.error('Ошибка при отправке данных', response);
                                         }
-                                    }
-                                }, {
-                                    text: 'Отмена',
-                                    handler: function () {
-                                        userWindow.close();
-                                    }
-                                }]
-                            });
-                
-                            userWindow.show();
-                        }
+                                    });
+                                }
+                            }
+                        }, {
+                            text: 'Отмена',
+                            handler: function () {
+                                userWindow.close();
+                            }
+                        }]
                     });
+        
+                    userWindow.show();
+                }
+            });
                     
                     
             
@@ -100,7 +102,17 @@
                     property: 'Id'
                 }],
                 model: 'Report',
-                                
+                proxy: {
+                    type: 'rest',
+                    url: START_URL + '/Auth/GetAll', 
+                    reader: {
+                        type: 'json',
+                        rootProperty: 'data'
+                    },
+                    wrter: {
+                        type: 'json'
+                    }
+                },         
                 autoLoad: true 
             });
     
@@ -109,7 +121,7 @@
                 title: 'Рабоа и назначение новых владельцев автосервисов',
                 store: store,
                 columns: [
-                    { text: 'Порядковый номер', dataIndex: 'id', editor: 'textfield', flex: 1},
+                    { text: 'ID', dataIndex: 'id', editor: 'textfield'},
                     { text: 'Юзернейм', dataIndex: 'name', editor: 'textfield', flex: 1 },
                     { text: 'Почта', dataIndex: 'email', editor: 'textfield', flex: 1 },
                     { text: 'Роль пользователя', dataIndex: 'typeUserRole', editor: 'textfield',flex: 1 },
@@ -122,7 +134,17 @@
                             handler: function (grid, rowIndex, colIndex) {
                                 var record = grid.getStore().getAt(rowIndex);
                                 var reportId = record.get('id');
-                                store.remove(record)
+                                Ext.Ajax.request({
+                                    url: START_URL + '/Admin/DeleteUserId/' + reportId,
+                                    method: 'DELETE',
+                                    success: function (response, opts) { 
+                                        alert("Запись с ReportId " + reportId + " удалена");
+                                        store.remove(record);
+                                    },
+                                    failure: function (response, opts) {
+                                        alert("Произошла ошибка при удалении записи");
+                                    }
+                                });
                                 
                             }
                         }]
@@ -166,7 +188,7 @@
                             });
         
                             Ext.Ajax.request({
-                                url: 'https://localhost:7135/Admin/EditUserName',
+                                url: START_URL + '/Admin/EditUserName',
                                 method: 'PUT',
                                 jsonData: dataToSend,
                                 success: function (response) {
@@ -180,9 +202,6 @@
                     }
                 })
                 ],
-                flex: 1, 
-                height: 1500,
-                width: '800',
                   
                                         
                 renderTo: Ext.getBody()
@@ -192,6 +211,15 @@
         
     });
     </script>
+    
+    
+    @*
+    12.01
+    Create, update, delete repo for assortments 
+    View for Studia before assortments grid.
+    Create assortments page for react-client
+    Do Authorize for users react
+*@
 </div>
 </body>
 </html>
